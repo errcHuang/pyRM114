@@ -1,0 +1,29 @@
+TET - Train Everything 
+Keep statistics on every known text.
+Verdict: pretty bad
+
+Train Only Errors (TOE) 
+- if classifier gets something wrong, train the text as a message of the message it should've been classified into
+Verdict: pretty good
+
+Single Sided Thick Threshold Training (SSTTT) 
+- same as TOE except with added thing
+- even if classifier gets something correct, checks "how" strongly correct the class was. If margin of correctness not high enough, then train anyways
+
+Double Sided Thick Threshold Training (DSTTT)
+- same as SSTTT except train "out" of every incorrect class
+- good for Winnow
+
+Double Sided Thick Threshold Test and Reinforcement Training (DSTTTR)
+- Same as SSTTT, but text gets reclassifeid and improvement measured
+- If new classification doesn't meet threshold req, or doesn't improve enough (3 pR units), then text gets trained out of incorrect classes
+- Trains using pR values after training and retesting
+
+Train Till Exhaustion (TTE)
+- After training new text into classifier, re-classify
+- If not, "adequately learned" yet, train again (repeat as necessary)
+- Tip: put a loop count maximum
+
+Train Until No Errors (TUNE) 
+- repeat testing and training until no more errors are made
+- seems like a recipe for overfitting lmao
