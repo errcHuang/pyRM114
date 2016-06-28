@@ -65,6 +65,8 @@ def main(argv):
 #basically training and test set partitioning is outside scope of class,
 #though there will be an evaluator function
 class pyRM114:
+    PROB_LIST = namedtuple('PROB_LIST', ['match', 'probability', 'pr'])
+
     def __init__(self, *args, directory='.', algorithm='osb unique microgroom'):
         self.categories = args #list of categories to classify to
         self.directory = directory #directory to save all files
@@ -72,8 +74,17 @@ class pyRM114:
         _create_crm_files(categories, algorithm)
 
         #its user responsibility to separate training files into small and separate textfiles
+    
+    def train(self, category, training_string):
+        #write to text file
+        file_dir = os.path.join(self.directory, 'train.tmp')
+        with open(file_dir, 'w') as f:
+            f.write(training_string)
+        _train(file_dir, category)    
+        subprocess.Popen(['rm', '-rf',file_dir])
+
     #by default will split training files into lines and train each line
-    def train(self, category, *args, train_method='TET', delimiter='\n'):
+    def train_textfile(self, category, *args, train_method='TET', delimiter='\n'):
         #check if category exists
         if category is not in self.categories:
             raise IndexError('Category does not exist!')
@@ -98,8 +109,20 @@ class pyRM114:
                     _smart_train(best_match, prob_list, category, train_method, 'train.tmp')
                     #delete temporary file
                     subprocess.Popen('rm -rf train.tmp', shell=True)
+
+    def classify(self, string):
+        #write to text file
+        file_dir = os.path.join(self.directory, 'classify.tmp')
+        with open(file_dir, 'w') as f:
+            f.write(string)
+        bestMatch, probList = _classify(file_dir)
+            print 'best match: ' + bestMatch
+            print 'probabilities:'
+            for tup in probList:
+                print '\t' + str(tup[0]) + ': ' + str(tup[1])
+    
     #takes filename as args
-    def classify_command(*args):
+    def classify_textfiles(self, *args):
         for textfile in args:
             bestMatch, probList = _classify(str(textfile))
             print 'best match: ' + bestMatch
@@ -115,8 +138,6 @@ class pyRM114:
 
         if (crm is True):
             subprocess.call('rm -f *.crm', shell=True)
-
-
 
     def evaluate(self):
         #if --eval flag is used, then classify test set and print statistics
@@ -272,8 +293,10 @@ class pyRM114:
         it = iter(outList)
         for x in it:
             x.rstrip(':')
-            probList.append((x, float(next(it)), float(next(it)) ))
-
+            p = PROB_LIST(x, float(next(it)), float(next(it)))
+            probList.append(p)
+            #probList.append((x, float(next(it)), float(next(it)) ))
+        
         #probList: (match, probability, pR)
 
         return (bestMatch, tuple(probList)) 
