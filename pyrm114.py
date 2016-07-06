@@ -1,4 +1,3 @@
-from tweepy import OAuthHandler
 from sklearn.metrics import *
 from collections import namedtuple
 import numpy as np
@@ -13,64 +12,20 @@ try:
 except:
     import pickle
 
-def main(argv):
-    #Create top level parser
-    parser = argparse.ArgumentParser(
-            description='Machine learning classifier that learns people\'s speech patterns via their tweets.',
-            prog='realpolitalk.py')
-    subparsers = parser.add_subparsers(help='Use one of the following three commands:\n' \
-                                            '\ttrain --help\n' \
-                                            '\tclassify --help\n' \
-                                            '\treset --help\n')
-
-    #create parser for 'train' command
-    parser_train = subparsers.add_parser('train', help='given twitter handles, train the classifier')
-    parser_train.add_argument('screen_names', nargs='+',
-            help = 'twitter handles for those whose tweets you want to use to train the classifier')
-    parser_train.add_argument('--trainpartition', '-tp', nargs='?', default='.8', type=float,
-            help = 'portion of tweets allocated for training. rest is for testing')
-    parser_train.add_argument('--algorithm', '-a',  nargs='?', type=str,  default='osb unique microgroom',
-            help = 'type of algorithm for crm114. e.g. \'%(default)s\'')
-    parser_train.add_argument('--directory', '-d', nargs='?', type=str, default = os.path.dirname(os.path.abspath(__file__)),
-            help = 'directory that all program files should go into')
-    parser_train.add_argument('--eval', nargs='?', type=argparse.FileType('w'), const = sys.stdout,
-            help = 'evaluate effectiveness of algorithm by separating tweets into training/test sets and printing model evaluation statistics')
-    parser_train.add_argument('--trainmethod', '-tm', nargs='*',  
-            help = 'change method of training (TOE, SSTTT, DSTTT, DSTTTR, TTE, TUNE). only works with the --eval flag')
-    parser_train.set_defaults(func=train_command)
-    #realpolitalk specific
-    parser_train.add_argument('--offline', action='store_true', help = 'use offline saved tweets')
-
-    #create parser for 'reset' command
-    parser_reset = subparsers.add_parser('reset',
-         help = 'commands to delete saved files (corpus, tweets, crm).')
-    parser_reset.add_argument('--corpus', action='store_true', help = 'deletes all trained corpuses')
-    parser_reset.add_argument('--crm', action='store_true', help = 'remove .crm files')
-    parser_reset.add_argument('--all', action='store_true', help = 'deletes corpuses, tweets, and crm files')
-    #realpolitalk specific
-    parser_reset.add_argument('--tweets', action='store_true', help = 'deletes all saved offline tweets')
-    parser_reset.set_defaults(func = reset_command)
-
-    #-classify - UNDER CONSTRUCTION
-    parser_classify = subparsers.add_parser('classify', help='classify textfile(s) based on trained corpuses')
-    parser_classify.add_argument('textfiles', nargs='+', type=str, help='textfiles for classifying. E.g. test.txt')
-    parser_classify.set_defaults(func = classify_command)
-
-    #parse the args and call whichever function was selected (func=...)
-    args = parser.parse_args()
-    #args.func(args)
-
 #basically training and test set partitioning is outside scope of class,
 #though there will be an evaluator function
 class pyrm114:
     PROB_LIST = namedtuple('PROB_LIST', ['match', 'probability', 'pr'])
 
-    def __init__(self, list_of_categories, directory=os.getcwd(), algorithm='osb unique microgroom'):
+    def __init__(self, list_of_categories, 
+            directory=os.getcwd(), 
+            algorithm='osb unique microgroom',
+            word_pattern='[[:graph:]]+'):
         self.categories = list_of_categories #list of categories to classify to
         self.directory = directory #directory to save all files
         self.algorithm = algorithm
         self.reset()
-        self._create_crm_files(self.categories, algorithm)
+        self._create_crm_files(self.categories, algorithm, word_pattern)
 
     
     def train(self, category, training_string):
@@ -114,22 +69,14 @@ class pyrm114:
         with open(file_dir, 'w') as f:
             f.write(string)
         bestMatch, probList = self._classify(file_dir)
-        print 'best match: ' + bestMatch[0]
-        print 'probabilities:'
-        for tup in probList:
-            print '\t' + str(tup[0]) + ': ' + str(tup[1]) #prints probability and pR
-
+        self._print_classify(bestMatch, probList)
         subprocess.Popen(['rm', file_dir])
     
     #takes filename as args
     def classify_textfiles(self, *args):
         for textfile in args:
             bestMatch, probList = self._classify(str(textfile))
-            print 'best match: ' + bestMatch[0]
-            print 'probabilities:'
-            for tup in probList:
-                print '\t' + str(tup[0]) + ': ' + str(tup[1])
-            print
+            self._print_classify(bestMatch, probList)
         #clean_workspace()
 
     def reset(self, corpus=True, crm=True):
@@ -175,7 +122,13 @@ class pyrm114:
                 break
         return allFilesExist
 
-   
+    def _print_classify(self, bestMatch, probList):
+        print 'best match: ' + bestMatch[0]
+        print 'match, probability, pr:'
+        for tup in probList:
+            print '\t', str(tup[0]), str(tup[1]), str(tup[2]) #prints probability and pR
+
+    
     def _plot_confusion_matrix(self, cm, labels, title='Confusion matrix', cmap=plt.cm.Blues):
         plt.imshow(cm, interpolation='nearest', cmap=cmap)
         plt.title(title)
@@ -302,13 +255,13 @@ class pyrm114:
 
         return (bestMatch, tuple(probList)) 
 
-    def _create_crm_files(self, file_names, classification_type):
+    def _create_crm_files(self, file_names, classification_type, word_pat):
         #classification_type = classification_type.rstrip('>').strip('<')
         CLASSIFY_EXT = '.css'    #create files if they don't exist
         UNLEARN_CMD = "{ learn <%s refute> (:*:_arg2:) }"
         LEARN_CMD = "{ learn <%s> (:*:_arg2:) }"
         CLASSIFY_CMD = "{ isolate (:stats:);" \
-                " classify <%s> ( %s ) (:stats:);" \
+                " classify <%s> ( %s ) (:stats:) /%s/;" \
                 " match [:stats:] (:: :best: :prob: :pr:)" \
                 " /Best match to file #. \\(([[:graph:]]+)\\) [[:graph:]]+: ([0-9\\.]+)[[:space:]]+pR:[[:space:]]+([[:graph:]]+)/;" \
                 " %s " \
@@ -338,6 +291,7 @@ class pyrm114:
 
         classifyCRM.write(CLASSIFY_CMD % (classification_type,
                                           ' '.join(name_list),
+                                          word_pat,
                                           ' '.join(match_list),
                                           ' '.join(output_list)
                                          ))
@@ -374,6 +328,56 @@ def get_training_and_test_set(trainProportion, dataset):
         training_data.append(data[:trainIndex]) #partitions training set from start to random index
         test_data.append(data[trainIndex:]) #partition test set from random index to end
     return (training_data, test_data)
+
+# def main(argv):
+#     #Create top level parser
+#     parser = argparse.ArgumentParser(
+#             description='Machine learning classifier that learns people\'s speech patterns via their tweets.',
+#             prog='pyrm114.py')
+#     subparsers = parser.add_subparsers(help='Use one of the following three commands:\n' \
+#                                             '\ttrain --help\n' \
+#                                             '\tclassify --help\n' \
+#                                             '\treset --help\n')
+# 
+#     #create parser for 'train' command
+#     parser_train = subparsers.add_parser('train', help='given twitter handles, train the classifier')
+#     parser_train.add_argument('--trainstring', '-ts', nargs=2, type=str, 
+#             help = 'train a string')
+#     parser_train.add_argument('screen_names', nargs='+',
+#             help = 'twitter handles for those whose tweets you want to use to train the classifier')
+#     parser_train.add_argument('--trainpartition', '-tp', nargs='?', default='.8', type=float,
+#             help = 'portion of tweets allocated for training. rest is for testing')
+#     parser_train.add_argument('--algorithm', '-a',  nargs='?', type=str,  default='osb unique microgroom',
+#             help = 'type of algorithm for crm114. e.g. \'%(default)s\'')
+#     parser_train.add_argument('--directory', '-d', nargs='?', type=str, default = os.path.dirname(os.path.abspath(__file__)),
+#             help = 'directory that all program files should go into')
+#     parser_train.add_argument('--eval', nargs='?', type=argparse.FileType('w'), const = sys.stdout,
+#             help = 'evaluate effectiveness of algorithm by separating tweets into training/test sets and printing model evaluation statistics')
+#     parser_train.add_argument('--trainmethod', '-tm', nargs='*',  
+#             help = 'change method of training (TOE, SSTTT, DSTTT, DSTTTR, TTE, TUNE). only works with the --eval flag')
+#     parser_train.set_defaults(func=train_command)
+#     #realpolitalk specific
+#     parser_train.add_argument('--offline', action='store_true', help = 'use offline saved tweets')
+# 
+#     #create parser for 'reset' command
+#     parser_reset = subparsers.add_parser('reset',
+#          help = 'commands to delete saved files (corpus, tweets, crm).')
+#     parser_reset.add_argument('--corpus', action='store_true', help = 'deletes all trained corpuses')
+#     parser_reset.add_argument('--crm', action='store_true', help = 'remove .crm files')
+#     parser_reset.add_argument('--all', action='store_true', help = 'deletes corpuses, tweets, and crm files')
+#     #realpolitalk specific
+#     parser_reset.add_argument('--tweets', action='store_true', help = 'deletes all saved offline tweets')
+#     parser_reset.set_defaults(func = reset_command)
+# 
+#     #-classify - UNDER CONSTRUCTION
+#     parser_classify = subparsers.add_parser('classify', help='classify textfile(s) based on trained corpuses')
+#     parser_classify.add_argument('textfiles', nargs='+', type=str, help='textfiles for classifying. E.g. test.txt')
+#     parser_classify.set_defaults(func = classify_command)
+# 
+#     #parse the args and call whichever function was selected (func=...)
+#     args = parser.parse_args()
+#     args.func(args)
+
 
 #if __name__ == '__main__':
 #    main(sys.argv[1:])
