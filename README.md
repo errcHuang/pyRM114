@@ -62,7 +62,7 @@ p.classify('change we can')
 #	Donald_Trump: 0.211 -0.57
 
 
-#resetting (deleting the trained classifier)
+#resetting (deleting the trained classifier/.css files)
 p.reset()
 ```
 ##Advanced Usage 
@@ -71,8 +71,8 @@ To be added...
 
 ##Misc.
 ###CRM114
-[CRM114](crm114.sourceforge.net) is basically a programming language/engine that is centered entirely around parsing and learning/classifying text streams. 
+[CRM114](crm114.sourceforge.net) is a programming language/engine that is centered entirely around parsing and learning/classifying text streams. 
 
-Originally used for spam classification, CRM114 is super fast (written in C) and wildly accurate (>99.9%). You can basically plug-and-play with different algorithms (Hidden Markov Model, OSB, winnow, bit entropy, etc.) with relative ease.
+Originally used for spam classification, CRM114 is super fast (written in C) and wildly accurate (>99.9%). One can essentially plug-and-play with different algorithms (Hidden Markov Model, OSB, winnow, bit entropy, etc.) with relative ease.
 
 
