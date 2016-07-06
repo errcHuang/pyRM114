@@ -79,7 +79,7 @@ class pyrm114:
             self._print_classify(bestMatch, probList)
         #clean_workspace()
 
-    def reset(self, corpus=True, crm=True):
+    def reset(self, corpus=True, crm=False):
         if (corpus is True):
             subprocess.call('rm -f *.css', shell=True) #remove all corpus type files
 
