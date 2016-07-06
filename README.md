@@ -3,8 +3,10 @@
 Makes CRM114 beautiful and easy to use via a python wrapper interface
 
 ##Requirements:
-- Python 2.7 
+- Python 2.7
+- scikit-learn ([see 'install an official release' section](http://scikit-learn.org/stable/developers/advanced_installation.html))
 - CRM-114 (installation instructions below)
+- (Recommended) numpy, scipy ([instructions](http://scipy.org/install.html))
 
 ###Debian/Ubuntu
 
@@ -36,6 +38,8 @@ cd ..
 
 ##Installation
 `pip install pyrm114`
+
+Note: if you encounter issues make sure you have installed numpy and scikit-learn before pip installing. Those two packages tend to cause issues
 
 ##Usage:
 The basic usage pipeline for realpolitalk is to _train_ then _classify_ (and _reset_) as needed
