@@ -2,4 +2,5 @@
 setup.cfg
 setup.py
 pyrm114/__init__.py
-pyrm114/pyrm114.py
+pyrm114/interface.py
+pyrm114/validation.py

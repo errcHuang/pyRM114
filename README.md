@@ -56,6 +56,7 @@ p.train('Donald_Trump', 'Make America great again')
 #classifying
 p.classify('change we can')
 
+''' OUTPUT FOR CLASSIFY '''
 #best match: Barack_Obama
 #match, probability, pr:
 #	Barack_Obama: 0.789 0.57

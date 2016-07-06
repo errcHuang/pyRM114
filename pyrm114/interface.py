@@ -63,13 +63,13 @@ class pyrmClassifier:
                     #delete temporary file
                     subprocess.Popen('rm -rf train.tmp', shell=True)
 
-    def classify(self, string):
+    def classify(self, string, output=sys.stdout):
         #write to text file
         file_dir = os.path.join(self.directory, 'classify.tmp')
         with open(file_dir, 'w') as f:
             f.write(string)
         bestMatch, probList = self._classify(file_dir)
-        self._print_classify(bestMatch, probList)
+        self._print_classify(bestMatch, probList, output)
         subprocess.Popen(['rm', file_dir])
     
     #takes filename as args
@@ -122,11 +122,11 @@ class pyrmClassifier:
                 break
         return allFilesExist
 
-    def _print_classify(self, bestMatch, probList):
-        print 'best match: ' + bestMatch[0]
-        print 'match, probability, pr:'
+    def _print_classify(self, bestMatch, probList, print_location):
+        print >>print_location, 'best match: ' + bestMatch[0]
+        print >>print_location, 'match, probability, pr:'
         for tup in probList:
-            print '\t', str(tup[0]), str(tup[1]), str(tup[2]) #prints probability and pR
+            print >>print_location, '\t', str(tup[0]), str(tup[1]), str(tup[2]) #prints probability and pR
 
     
     def _plot_confusion_matrix(self, cm, labels, title='Confusion matrix', cmap=plt.cm.Blues):
