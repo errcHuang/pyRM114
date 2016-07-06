@@ -69,6 +69,7 @@ class pyrm114:
         self.categories = list_of_categories #list of categories to classify to
         self.directory = directory #directory to save all files
         self.algorithm = algorithm
+        self.reset()
         self._create_crm_files(self.categories, algorithm)
 
     
@@ -77,8 +78,8 @@ class pyrm114:
         file_dir = os.path.join(self.directory, 'train.tmp')
         with open(file_dir, 'w') as f:
             f.write(training_string)
-        self._train(file_dir, category)    
-        subprocess.Popen(['rm', '-rf',file_dir])
+        self._train(file_dir, category)
+        os.remove(file_dir)
 
     #by default will split training files into lines and train each line
     def train_textfile(self, category, train_method='TET', delimiter='\n', *args):
@@ -113,7 +114,7 @@ class pyrm114:
         with open(file_dir, 'w') as f:
             f.write(string)
         bestMatch, probList = self._classify(file_dir)
-        print 'best match: ' + bestMatch
+        print 'best match: ' + bestMatch[0]
         print 'probabilities:'
         for tup in probList:
             print '\t' + str(tup[0]) + ': ' + str(tup[1]) #prints probability and pR
@@ -124,7 +125,7 @@ class pyrm114:
     def classify_textfiles(self, *args):
         for textfile in args:
             bestMatch, probList = self._classify(str(textfile))
-            print 'best match: ' + bestMatch
+            print 'best match: ' + bestMatch[0]
             print 'probabilities:'
             for tup in probList:
                 print '\t' + str(tup[0]) + ': ' + str(tup[1])
