@@ -1,6 +1,4 @@
-from pyrm114 import pyrm114 
-
-version = '0.3'
+version = '0.31'
 
 def check_version():
     """
