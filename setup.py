@@ -30,7 +30,7 @@ setup(
 	'matplotlib>=1.4.3',
 	'numpy>=1.11.1',
 	'scikit-learn>=0.17.1',
-	'requests'
+	'requests',
 	'jsonschema',
 	'json-spec'
   ]
