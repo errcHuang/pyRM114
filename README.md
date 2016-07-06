@@ -41,9 +41,9 @@ cd ..
 The basic usage pipeline for realpolitalk is to _train_ then _classify_ (and _reset_) as needed
 
 ```python
-from pyrm114 import pyrm114
+from pyrm114 import pyrmClassifier
 
-p = pyrm114(['Barack_Obama', 'Donald_Trump']) #initialize by specifying classifier categories
+p = pyrmClassifier(['Barack_Obama', 'Donald_Trump']) #initialize by specifying classifier categories
 
 #training with strings
 p.train('Barack_Obama', 'Change we can believe in')

@@ -14,7 +14,7 @@ except:
 
 #basically training and test set partitioning is outside scope of class,
 #though there will be an evaluator function
-class pyrm114:
+class pyrmClassifier:
     PROB_LIST = namedtuple('PROB_LIST', ['match', 'probability', 'pr'])
 
     def __init__(self, list_of_categories, 
@@ -306,28 +306,6 @@ class pyrm114:
             pipe = os.popen(('crm '+ os.path.join(self.directory,'learn.crm') + ' ' +  str(n + CLASSIFICATION_EXT)), 'w')
             pipe.close()
         #print 'created corpus files'
-
-
-#slices a list into n nearly-equal-length partitions
-#returns list of lists
-def random_partition(lst, n):
-    random.shuffle(lst) #optional
-    division = len(lst) / float(n)
-    return [ lst[int(round(division * i)): int(round(division * (i+1)))] for i in xrange(n) ]
-
-#Randomly resamples labeled datasets into comprehensive training set and test set
-#reshuffles data and returns training/test sets at
-#the list 'dataset' should have lists that represent classes
-def get_training_and_test_set(trainProportion, dataset):
-    training_data = []
-    test_data = []
-    for data in dataset:
-        random.shuffle(data) #optional
-        trainIndex = trainProportion * len(data) #calculates index for end of training set
-        trainIndex = int(round(trainIndex))
-        training_data.append(data[:trainIndex]) #partitions training set from start to random index
-        test_data.append(data[trainIndex:]) #partition test set from random index to end
-    return (training_data, test_data)
 
 # def main(argv):
 #     #Create top level parser
