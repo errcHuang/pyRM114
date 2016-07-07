@@ -29,10 +29,9 @@ class pyrmClassifier:
         file_dir = os.path.join(self.directory, 'train.tmp')
         with open(file_dir, 'w') as f:
             f.write(training_string)
-
         bestMatch, probList = self.classify(training_string, record=False) #classify
 
-        self._smart_train(self, bestMatch, probList, category, train_method, file_dir, pr)
+        self._smart_train(bestMatch, probList, category, train_method, file_dir, pr)
         os.remove(file_dir)
 
     def untrain(self, category, string):
@@ -154,7 +153,8 @@ class pyrmClassifier:
     #match: (name_of_match, prob_of_match, pr_of_match)
     #probList = [ (name1, probability1, pR1) (name2, probability2, pR2) ...]
     #train_method: (name_of_method, pR_threshold)
-    def _smart_train(self, match, probList, truth_match_name, train_method, textfilename, prThreshold = 10.0):
+    def _smart_train(self, match, probList, truth_match_name, train_method, textfilename, 
+            prThreshold = 10.0):
         name_of_match = match[0]
         pr = match[2]
         if train_method == 'TOE': #train on error
