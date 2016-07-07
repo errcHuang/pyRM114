@@ -16,7 +16,7 @@ class pyrmClassifier:
     def __init__(self, list_of_categories, 
             directory=os.getcwd(), 
             algorithm='osb unique microgroom',
-            word_pattern='[[:graph:]]+'
+            word_pattern='[[:graph:]]+',
             reset=True):
         self.categories = list_of_categories #list of categories to classify to
         self.directory = directory #directory to save all files
