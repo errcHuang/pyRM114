@@ -34,6 +34,13 @@ class pyrmClassifier:
         self._train(file_dir, category)
         os.remove(file_dir)
 
+    def untrain(self, category, string):
+        file_dir = os.path.join(self.directory, 'untrain.tmp')
+        with open(file_dir, 'w') as f:
+            f.write(string)
+        self._untrain(file_dir, category)
+        os.remove(file_dir)
+
     #by default will split training files into lines and train each line
     def train_textfile(self, category, train_method='TET', delimiter='\n', *args):
         #check if category exists
