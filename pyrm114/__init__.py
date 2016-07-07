@@ -15,4 +15,4 @@ def check_version():
 
 __license__ = '(c) 2016 Eric Huang. ' \
               'MIT License. See LICENSE file for details.'
-__all__ = ['pyrmClassifier', 'validation']
+__all__ = ['pyrmClassifier', 'pyrmEval']
