@@ -25,8 +25,6 @@ class pyrmClassifier:
             self.reset()
         self._create_crm_files(self.categories, algorithm, word_pattern)
 
-    def _smart_train(self, match, probList, truth_match_name, train_method, textfilename,
-    
     def train(self, category, training_string, train_method='TET', pr=10.0):
         #write training string to textfile so can be processed by CRM114
         file_dir = os.path.join(self.directory, 'train.tmp')
