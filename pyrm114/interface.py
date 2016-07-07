@@ -25,13 +25,17 @@ class pyrmClassifier:
             self.reset()
         self._create_crm_files(self.categories, algorithm, word_pattern)
 
+    def _smart_train(self, match, probList, truth_match_name, train_method, textfilename,
     
-    def train(self, category, training_string):
-        #write to text file
+    def train(self, category, training_string, train_method='TET', pr=10.0):
+        #write training string to textfile so can be processed by CRM114
         file_dir = os.path.join(self.directory, 'train.tmp')
         with open(file_dir, 'w') as f:
             f.write(training_string)
-        self._train(file_dir, category)
+
+        bestMatch, probList = self.classify(training_string, record=False) #classify
+
+        self._smart_train(self, bestMatch, probList, category, train_method, file_dir, pr)
         os.remove(file_dir)
 
     def untrain(self, category, string):
@@ -40,33 +44,6 @@ class pyrmClassifier:
             f.write(string)
         self._untrain(file_dir, category)
         os.remove(file_dir)
-
-    #by default will split training files into lines and train each line
-    def train_textfile(self, category, train_method='TET', delimiter='\n', *args):
-        #check if category exists
-        if category not in self.categories:
-            raise IndexError('Category does not exist!')
-            return
-
-        #global vars
-        file_names = args #screen names for training
-
-        #train classifier
-        print 'training...'
-        for fName in file_names:
-            with open(fName, 'r') as f:
-                entire_file = f.read()
-                file_sections = entire_file.split(delimiter)
-
-                for section in file_sections:
-                    #write section to temporary train file
-                    with open('train.tmp', 'w') as t:
-                        t.write(section)
-                    #attempt to classify and then train based on results
-                    best_match, prob_list = self._classify('train.tmp')
-                    self._smart_train(best_match, prob_list, category, train_method, 'train.tmp')
-                    #delete temporary file
-                    subprocess.Popen('rm -rf train.tmp', shell=True)
 
     def classify(self, string, record=True, output=sys.stdout):
         #write to text file
@@ -80,13 +57,6 @@ class pyrmClassifier:
 
         return (bestMatch, probList)
     
-    #takes filename as args
-    def classify_textfiles(self, *args):
-        for textfile in args:
-            bestMatch, probList = self._classify(str(textfile))
-            self._print_classify(bestMatch, probList)
-        #clean_workspace()
-
     def reset(self, corpus=True, crm=False):
         if (corpus is True):
             subprocess.call('rm -f *.css', shell=True) #remove all corpus type files
@@ -128,6 +98,43 @@ class pyrmClassifier:
                 break
         return allFilesExist
 
+    #DEPRECATED
+    #by default will split training files into lines and train each line
+    def _train_textfile(self, category, train_method='TET', delimiter='\n', *args):
+        #check if category exists
+        if category not in self.categories:
+            raise IndexError('Category does not exist!')
+            return
+
+        #global vars
+        file_names = args #screen names for training
+
+        #train classifier
+        print 'training...'
+        for fName in file_names:
+            with open(fName, 'r') as f:
+                entire_file = f.read()
+                file_sections = entire_file.split(delimiter)
+
+                for section in file_sections:
+                    #write section to temporary train file
+                    with open('train.tmp', 'w') as t:
+                        t.write(section)
+                    #attempt to classify and then train based on results
+                    best_match, prob_list = self._classify('train.tmp')
+                    self._smart_train(best_match, prob_list, category, train_method, 'train.tmp')
+                    #delete temporary file
+                    subprocess.Popen('rm -rf train.tmp', shell=True)
+    
+    #DEPRECATED
+    #takes filename as args
+    def _classify_textfiles(self, *args):
+        for textfile in args:
+            bestMatch, probList = self._classify(str(textfile))
+            self._print_classify(bestMatch, probList)
+        #clean_workspace()
+
+    
     def _print_classify(self, bestMatch, probList, print_location):
         print >>print_location, 'best match: ' + bestMatch[0]
         print >>print_location, 'match, probability, pr:'
@@ -150,8 +157,7 @@ class pyrmClassifier:
     #match: (name_of_match, prob_of_match, pr_of_match)
     #probList = [ (name1, probability1, pR1) (name2, probability2, pR2) ...]
     #train_method: (name_of_method, pR_threshold)
-    def _smart_train(self, match, probList, truth_match_name, train_method, textfilename,
-            prThreshold = 10.0):
+    def _smart_train(self, match, probList, truth_match_name, train_method, textfilename, prThreshold = 10.0):
         name_of_match = match[0]
         pr = match[2]
         if train_method == 'TOE': #train on error
