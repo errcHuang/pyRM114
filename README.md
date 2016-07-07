@@ -42,7 +42,7 @@ cd ..
 Note: if you encounter issues make sure you have installed numpy and scikit-learn before pip installing. Those two packages tend to cause issues
 
 ##Usage:
-The basic usage pipeline for realpolitalk is to _train_ then _classify_ (and _reset_) as needed
+The basic usage pipeline for pyRM114 is to _train_ then _classify_ (and _reset_) as needed
 
 ```python
 from pyrm114 import pyrmClassifier

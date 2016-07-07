@@ -7,10 +7,6 @@ import sys
 import subprocess
 import argparse
 import random
-try:
-    import cPickle as pickle
-except:
-    import pickle
 
 #basically training and test set partitioning is outside scope of class,
 #though there will be an evaluator function
