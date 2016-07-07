@@ -6,7 +6,6 @@ import os
 import sys
 import subprocess
 import argparse
-import random
 
 #basically training and test set partitioning is outside scope of class,
 #though there will be an evaluator function

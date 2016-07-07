@@ -1,4 +1,4 @@
-
+import random
 #slices a list into n nearly-equal-length partitions
 #returns list of lists
 def random_partition(lst, n):
