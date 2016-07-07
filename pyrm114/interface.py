@@ -49,7 +49,7 @@ class pyrmClassifier:
         bestMatch, probList = self._classify(file_dir)
         if record is True:
             self._print_classify(bestMatch, probList, output) #print to file/output
-        subprocess.Popen(['rm', file_dir])
+        #subprocess.Popen(['rm', file_dir])
 
         return (bestMatch, probList)
     

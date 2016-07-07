@@ -1,8 +1,9 @@
 import random
 #slices a list into n nearly-equal-length partitions
 #returns list of lists
-def random_partition(lst, n):
-    random.shuffle(lst) #optional
+def random_partition(lst, n, shuffle=True):
+    if shuffle is True:
+        random.shuffle(lst) #optional
     division = len(lst) / float(n)
     return [ lst[int(round(division * i)): int(round(division * (i+1)))] for i in xrange(n) ]
 
@@ -21,4 +22,7 @@ def make_training_and_test_set(trainProportion, shuffle=True, **kwargs):
         test_data.append( {key : class_list[trainIndex:]} ) #partition test set from random index to end
     return (training_data, test_data)
 
+#perform n-fold cross validation
+def cross_validate(n, dataset):
+    subpartitions = random_partition(dataset, n)
 
