@@ -68,14 +68,17 @@ class pyrmClassifier:
                     #delete temporary file
                     subprocess.Popen('rm -rf train.tmp', shell=True)
 
-    def classify(self, string, output=sys.stdout):
+    def classify(self, string, record=True, output=sys.stdout):
         #write to text file
         file_dir = os.path.join(self.directory, 'classify.tmp')
         with open(file_dir, 'w') as f:
             f.write(string)
         bestMatch, probList = self._classify(file_dir)
-        self._print_classify(bestMatch, probList, output)
+        if record is True:
+            self._print_classify(bestMatch, probList, output) #print to file/output
         subprocess.Popen(['rm', file_dir])
+
+        return (bestMatch, probList)
     
     #takes filename as args
     def classify_textfiles(self, *args):
@@ -94,8 +97,6 @@ class pyrmClassifier:
     def evaluate(self, y_true, y_pred, output=sys.stdout):
         #if --eval flag is used, then classify test set and print statistics
         print 'evaluating algorithm...'
-
-        temp_stats_file = open(os.path.join(self.directory, 'prob_distribution.txt'), 'w')
 
         print >>output,'------ EVALUATION STATS ------'
         #Compute Accuracy Score
