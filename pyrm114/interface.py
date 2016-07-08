@@ -255,14 +255,14 @@ class pyrmClassifier:
         probList = []
         it = iter(outList)
         for x in it:
-            x.rstrip(':')
+            x = x.rstrip(':')
             p = (x, float(next(it)), float(next(it)))
             probList.append(p)
             #probList.append((x, float(next(it)), float(next(it)) ))
         
         #probList: (match, probability, pR)
 
-        return (bestMatch, tuple(probList)) 
+        return (bestMatch, list(probList)) 
 
     def _create_crm_files(self, file_names, classification_type, word_pat):
         #classification_type = classification_type.rstrip('>').strip('<')

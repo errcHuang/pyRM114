@@ -11,6 +11,8 @@ def random_partition(lst, n, shuffle=True):
 #reshuffles data and returns training/test sets as list of dictionaries
 #the arguments should be lists that represent classes
 def make_training_and_test_set(trainProportion, shuffle=True, **kwargs):
+    if trainProportion > 1.0 or trainProportion < 0.0:
+        raise ValueError('trainPartition can only be between 0 and 1.0')
     training_data = []
     test_data = []
     for key, class_list in kwargs.iteritems():
@@ -23,6 +25,8 @@ def make_training_and_test_set(trainProportion, shuffle=True, **kwargs):
     return (training_data, test_data)
 
 #perform n-fold cross validation
-def cross_validate(n, dataset):
+#returns list of randomly sorted lists
+def create_cross_validate_set(n, shuffle=True, **kwargs):
+    dataset = make_training_and_test_set(1.0, True, **kwargs)
     subpartitions = random_partition(dataset, n)
-
+    return subpartitions
