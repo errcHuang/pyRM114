@@ -27,8 +27,8 @@ class pyrmClassifier:
 
     def train(self, category, training_string, train_method='TET', pr=10.0):
         #write training string to textfile so can be processed by CRM114
-        r = random.randint(0, len(training_string))
-        random_file_name = 'train'+str(r)+'.tmp'
+        #r = random.randint(0, len(training_string))
+        random_file_name = 'train.tmp'
         file_dir = os.path.join(self.directory, random_file_name)
         with open(file_dir, 'w') as f:
             f.write(training_string)
@@ -45,8 +45,8 @@ class pyrmClassifier:
 
     def classify(self, string, record=True, output=sys.stdout):
         #write to text file
-        r = random.randint(0, len(string))
-        random_file_name = 'classify'+str(r)+'.tmp'
+        #r = random.randint(0, len(string))
+        random_file_name = 'classify.tmp'
         file_dir = os.path.join(self.directory, random_file_name)
         with open(file_dir, 'w') as f:
             f.write(string)
