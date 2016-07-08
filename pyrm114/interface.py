@@ -26,11 +26,12 @@ class pyrmClassifier:
 
     def train(self, category, training_string, train_method='TET', pr=10.0):
         #write training string to textfile so can be processed by CRM114
-        file_dir = os.path.join(self.directory, 'train.tmp')
+        r = random.randint(0, len(training_string))
+        random_file_name = 'train'+str(r)+'.tmp'
+        file_dir = os.path.join(self.directory, random_file_name)
         with open(file_dir, 'w') as f:
             f.write(training_string)
         bestMatch, probList = self.classify(training_string, record=False) #classify
-
         self._smart_train(bestMatch, probList, category, train_method, file_dir, pr)
         os.remove(file_dir)
 
@@ -43,14 +44,14 @@ class pyrmClassifier:
 
     def classify(self, string, record=True, output=sys.stdout):
         #write to text file
-        file_dir = os.path.join(self.directory, 'classify.tmp')
+        r = random.randint(0, len(string))
+        random_file_name = 'classify'+str(r)+'.tmp'
+        file_dir = os.path.join(self.directory, random_file_name)
         with open(file_dir, 'w') as f:
             f.write(string)
         bestMatch, probList = self._classify(file_dir)
         if record is True:
             self._print_classify(bestMatch, probList, output) #print to file/output
-        #subprocess.Popen(['rm', file_dir])
-
         return (bestMatch, probList)
     
     def reset(self, corpus=True, crm=False):
@@ -248,6 +249,7 @@ class pyrmClassifier:
     # probList = [ (twitterHandle1, probability1, pR1) (twitterHandle2, probability2, pR2) ...]
     def _classify(self, textFileName):
         output =  subprocess.check_output('crm ' + os.path.join(self.directory, 'classify.crm') + ' < ' + textFileName, shell=True) #string output from crm114
+        os.remove(textFileName)
         outList = output.split()
         bestMatch = ( str(outList[0]), float(outList[1]), float(outList[2]) ) #(match, prob, pR)
         outList = outList[3:]
@@ -261,6 +263,7 @@ class pyrmClassifier:
             #probList.append((x, float(next(it)), float(next(it)) ))
         
         #probList: (match, probability, pR)
+
 
         return (bestMatch, list(probList)) 
 
