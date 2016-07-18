@@ -273,8 +273,8 @@ class pyrmClassifier:
     def _create_crm_files(self, file_names, classification_type, word_pat):
         #classification_type = classification_type.rstrip('>').strip('<')
         CLASSIFY_EXT = '.css'    #create files if they don't exist
-        UNLEARN_CMD = "{ learn <%s refute> (:*:_arg2:) }"
-        LEARN_CMD = "{ learn <%s> (:*:_arg2:) }"
+        UNLEARN_CMD = "{ learn <%s refute> (:*:_arg2:) /%s/}"
+        LEARN_CMD = "{ learn <%s> (:*:_arg2:) /%s/}"
         CLASSIFY_CMD = "{ isolate (:stats:);" \
                 " classify <%s> ( %s ) (:stats:) /%s/;" \
                 " match [:stats:] (:: :best: :prob: :pr:)" \
@@ -288,13 +288,13 @@ class pyrmClassifier:
                     ' /prob: ([[:graph:]]+), pR:[[:space:]]+([[:graph:]]+)/;'
         #create learn.crm
         learnCRM = open(os.path.join(self.directory,'learn.crm'), 'w')
-        learnCRM.write(LEARN_CMD % classification_type)
+        learnCRM.write(LEARN_CMD % (classification_type, word_pat))
         learnCRM.close()
         #print 'created learn.crm'
 
         #create unlearn.crm
         unlearnCRM = open(os.path.join(self.directory, 'unlearn.crm'), 'w')
-        unlearnCRM.write(UNLEARN_CMD % classification_type)
+        unlearnCRM.write(UNLEARN_CMD % (classification_type, word_pat))
         unlearnCRM.close()
         #print 'created unlearn.crm'
 
