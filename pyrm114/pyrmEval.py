@@ -28,5 +28,6 @@ def make_training_and_test_set(trainProportion, shuffle=True, **kwargs):
 #returns list of randomly sorted lists
 def create_cross_validate_set(n, shuffle=True, **kwargs):
     dataset = make_training_and_test_set(1.0, True, **kwargs)
+    #print type(dataset)
     subpartitions = random_partition(dataset, n)
     return subpartitions
