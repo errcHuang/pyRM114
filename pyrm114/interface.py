@@ -62,6 +62,7 @@ class pyrmClassifier:
         if (crm is True):
             subprocess.call('rm -f *.crm', shell=True)
 
+    #note you're going to have to close output yourself
     def evaluate(self, y_true, y_pred, output=sys.stdout, 
             accuracy=True, matrix=True, show_matrix=True, report=True):
         #if --eval flag is used, then classify test set and print statistics
@@ -84,7 +85,6 @@ class pyrmClassifier:
         if report:
             #Classification report
             print >>output, classification_report(y_true, y_pred, target_names=self.categories)
-        output.close()
 
     def crm_files_exist(self):
         #check if crm files exist already
