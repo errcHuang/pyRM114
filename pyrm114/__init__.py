@@ -1,4 +1,4 @@
-version = '0.5'
+version = '0.6'
 from interface import pyrmClassifier
 
 def check_version():

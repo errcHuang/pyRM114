@@ -62,11 +62,10 @@ class pyrmClassifier:
         if (crm is True):
             subprocess.call('rm -f *.crm', shell=True)
 
+    #note you're going to have to close output yourself
     def evaluate(self, y_true, y_pred, output=sys.stdout, 
-            accuracy=True, matrix=True, report=True):
+            accuracy=True, matrix=True, show_matrix=True, report=True):
         #if --eval flag is used, then classify test set and print statistics
-        print 'evaluating algorithm...'
-
         print >>output,'------ EVALUATION STATS ------'
         if accuracy:
             #Compute Accuracy Score
@@ -78,15 +77,14 @@ class pyrmClassifier:
             cm = confusion_matrix(y_true, y_pred, labels=self.categories)
             print >>output, 'Confusion matrix:\n', cm
             print >>output
-            #show confusion matrix
-            plt.figure()
-            self._plot_confusion_matrix(cm, self.categories)
-            plt.show()
+            if show_matrix:
+                plt.figure()
+                self._plot_confusion_matrix(cm, self.categories)
+                plt.show()
 
         if report:
             #Classification report
             print >>output, classification_report(y_true, y_pred, target_names=self.categories)
-        output.close()
 
     def crm_files_exist(self):
         #check if crm files exist already
