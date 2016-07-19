@@ -1,4 +1,5 @@
 import random
+import sys
 #slices a list into n nearly-equal-length partitions
 #returns list of lists
 def random_partition(lst, n, shuffle=True):
@@ -27,9 +28,12 @@ def make_training_and_test_set(trainProportion, shuffle=True, **kwargs):
     return (training_data, test_data)
 
 #perform n-fold cross validation
-#returns list of randomly sorted lists
+#returns list of lists of dictionaries
 def create_cross_validate_set(n, shuffle=True, **kwargs):
-    dataset, filler = make_training_and_test_set(1.0, True, **kwargs)
-    dataset = dataset.extend(filler)
+    dataset = []
+    for key, value_list in kwargs.items():
+        for values in value_list:
+            dataset.append({ key : values })
+    #dataset, filler = make_training_and_test_set(1.0, True, **kwargs)
     subpartitions = random_partition(dataset, n)
     return subpartitions
