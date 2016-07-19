@@ -65,8 +65,6 @@ class pyrmClassifier:
     def evaluate(self, y_true, y_pred, output=sys.stdout, 
             accuracy=True, matrix=True, show_matrix=True, report=True):
         #if --eval flag is used, then classify test set and print statistics
-        print 'evaluating algorithm...'
-
         print >>output,'------ EVALUATION STATS ------'
         if accuracy:
             #Compute Accuracy Score
