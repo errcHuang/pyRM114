@@ -300,7 +300,7 @@ class pyrmClassifier:
         classifyCRM = open('classify.crm', 'w')
         name_list = [name + CLASSIFY_EXT for name in file_names]
         match_list = [MATCH_VAR % (name, name, name, name, name) for name in name_list] #create list of MATCH_VARs based on screen name
-        output_list = ['%s: :*:%s_prob: :*:%s_pr:' % (name.split('.')[0], name, name) for name in name_list] #create list for output
+        output_list = ['%s: :*:%s_prob: :*:%s_pr:' % (os.path.splitext(name)[0], name, name) for name in name_list] #create list for output
 
         classifyCRM.write(CLASSIFY_CMD % (classification_type,
                                           ' '.join(name_list),
