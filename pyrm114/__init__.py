@@ -1,4 +1,4 @@
-version = '0.6'
+version = '0.62'
 from interface import pyrmClassifier
 import pyrmEval
 
