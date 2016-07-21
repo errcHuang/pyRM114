@@ -94,10 +94,11 @@ class pyrmClassifier:
                 plt.show()
 
         if precision_recall_fscore_support_bool:
+            #(precision, recall, f1b, support)
             prfs = precision_recall_fscore_support(y_true, y_pred, labels=self.categories)
             out_dict['precision_recall_fscore_support'] = prfs
-            print >>output, prfs
-            print >>output
+            #print >>output, prfs
+            #print >>output
 
         if classification_report_bool:
             #Classification report
