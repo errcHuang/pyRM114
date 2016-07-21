@@ -63,28 +63,46 @@ class pyrmClassifier:
             subprocess.call('rm -f *.crm', shell=True)
 
     #note you're going to have to close output yourself
-    def evaluate(self, y_true, y_pred, output=sys.stdout, 
-            accuracy=True, matrix=True, show_matrix=True, report=True):
-        #if --eval flag is used, then classify test set and print statistics
+    #http://scikit-learn.org/stable/modules/model_evaluation.html
+    #Output: dictionary 
+    def evaluate(self, y_true, y_pred, output=sys.stdout, **kwargs): 
+        accuracy_score_bool = kwargs.get('accuracy_score', False)
+        confusion_matrix_bool = kwargs.get('confusion_matrix', False)
+        plot_confusion_matrix = kwargs.get('plot_confusion_matrix', False)
+        precision_recall_fscore_support_bool = kwargs.get('precision_recall_fscore_support', False)
+        classification_report_bool = kwargs.get('classification_report', False)
+
+        out_dict = {}
+
         print >>output,'------ EVALUATION STATS ------'
-        if accuracy:
+        if accuracy_score_bool:
             #Compute Accuracy Score
+            score = accuracy_score(y_true, y_pred)
+            out_dict['accuracy_score'] = score
             print >>output, 'Accuracy score (normalized):', accuracy_score(y_true, y_pred)
         print >>output
 
-        if matrix:
+        if confusion_matrix_bool:
             #Confusion Matrix
             cm = confusion_matrix(y_true, y_pred, labels=self.categories)
+            out_dict['confusion_matrix'] = cm
             print >>output, 'Confusion matrix:\n', cm
             print >>output
-            if show_matrix:
+            if plot_confusion_matrix:
                 plt.figure()
                 self._plot_confusion_matrix(cm, self.categories)
                 plt.show()
 
-        if report:
+        if precision_recall_fscore_support_bool:
+            prfs = precision_recall_fscore_support(y_true, y_pred, labels=self.categories)
+            out_dict['precision_recall_fscore_support'] = prfs
+            print >>output, prfs
+            print >>output
+
+        if classification_report_bool:
             #Classification report
             print >>output, classification_report(y_true, y_pred, target_names=self.categories)
+        return out_dict
 
     def crm_files_exist(self):
         #check if crm files exist already
