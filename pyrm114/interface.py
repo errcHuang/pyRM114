@@ -317,8 +317,8 @@ class pyrmClassifier:
         #print 'created unlearn.crm'
 
         #create classify.crm
-        classifyCRM = open(os.path.join(self.directory, 'classify.crm'), 'w')
-        name_list = [ntpath.basename(name) + CLASSIFY_EXT for name in file_names]
+        classifyCRM = open('classify.crm', 'w')
+        name_list = [name + CLASSIFY_EXT for name in file_names]
         match_list = [MATCH_VAR % (name, name, name, name, name) for name in name_list] #create list of MATCH_VARs based on screen name
         output_list = ['%s: :*:%s_prob: :*:%s_pr:' % (os.path.splitext(name)[0], name, name) for name in name_list] #create list for output
 
