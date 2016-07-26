@@ -7,6 +7,7 @@ import sys
 import subprocess
 import argparse
 import random
+import ntpath
 
 #basically training and test set partitioning is outside scope of class,
 #though there will be an evaluator function
@@ -43,14 +44,13 @@ class pyrmClassifier:
         self._untrain(file_dir, category)
         os.remove(file_dir)
 
-    def classify(self, string, record=True, output=sys.stdout):
+    def classify(self, string, record=True, output=sys.stdout, random_file_name='classify.tmp'):
         #write to text file
         #r = random.randint(0, len(string))
-        random_file_name = 'classify.tmp'
-        file_dir = os.path.join(self.directory, random_file_name)
-        with open(file_dir, 'w') as f:
-            f.write(string)
-        bestMatch, probList = self._classify(file_dir)
+        #file_dir = os.path.join(self.directory, random_file_name)
+        #with open(file_dir, 'w') as f:
+        #    f.write(string)
+        bestMatch, probList = self._classify(string)
         if record is True:
             self._print_classify(bestMatch, probList, output) #print to file/output
         return (bestMatch, probList)
@@ -267,9 +267,12 @@ class pyrmClassifier:
     # classifies textfile and returns best match and probabilities
     # bestMatch = tuple(bestMatch bestProb, bestPR)
     # probList = [ (twitterHandle1, probability1, pR1) (twitterHandle2, probability2, pR2) ...]
-    def _classify(self, textFileName):
-        output =  subprocess.check_output('crm ' + os.path.join(self.directory, 'classify.crm') + ' < ' + textFileName, shell=True) #string output from crm114
-        os.remove(textFileName)
+    def _classify(self, text):
+        output = subprocess.check_output(
+                'echo \'' + text + '\'' + ' | ' + 'crm ' + os.path.join(self.directory, 'classify.crm'),
+                shell=True)
+        #output =  subprocess.check_output('crm ' + os.path.join(self.directory, 'classify.crm') + ' < ' + textFileName, shell=True) #string output from crm114
+        #os.remove(textFileName)
         outList = output.split()
         bestMatch = ( str(outList[0]), float(outList[1]), float(outList[2]) ) #(match, prob, pR)
         outList = outList[3:]
@@ -316,8 +319,8 @@ class pyrmClassifier:
         #print 'created unlearn.crm'
 
         #create classify.crm
-        classifyCRM = open('classify.crm', 'w')
-        name_list = [name + CLASSIFY_EXT for name in file_names]
+        classifyCRM = open(os.path.join(self.directory, 'classify.crm'), 'w')
+        name_list = [ntpath.basename(name) + CLASSIFY_EXT for name in file_names]
         match_list = [MATCH_VAR % (name, name, name, name, name) for name in name_list] #create list of MATCH_VARs based on screen name
         output_list = ['%s: :*:%s_prob: :*:%s_pr:' % (os.path.splitext(name)[0], name, name) for name in name_list] #create list for output
 
