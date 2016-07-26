@@ -43,17 +43,30 @@ class pyrmClassifier:
             f.write(string)
         self._untrain(file_dir, category)
         os.remove(file_dir)
+    
+    # classifies textfile and returns best match and probabilities
+    # bestMatch = tuple(bestMatch bestProb, bestPR)
+    # probList = [ (twitterHandle1, probability1, pR1) (twitterHandle2, probability2, pR2) ...]
+    def classify(self, text):
+        output = subprocess.check_output(
+                'echo \'' + text + '\'' + ' | ' + 'crm ' + os.path.join(self.directory, 'classify.crm'),
+                shell=True)
+        #output =  subprocess.check_output('crm ' + os.path.join(self.directory, 'classify.crm') + ' < ' + textFileName, shell=True) #string output from crm114
+        #os.remove(textFileName)
+        outList = output.split()
+        bestMatch = ( str(outList[0]), float(outList[1]), float(outList[2]) ) #(match, prob, pR)
+        outList = outList[3:]
 
-    def classify(self, string, record=False, output=sys.stdout, random_file_name='classify.tmp'):
-        #write to text file
-        #r = random.randint(0, len(string))
-        #file_dir = os.path.join(self.directory, random_file_name)
-        #with open(file_dir, 'w') as f:
-        #    f.write(string)
-        bestMatch, probList = self._classify(string)
-        if record is True:
-            self._print_classify(bestMatch, probList, output) #print to file/output
-        return (bestMatch, probList)
+        probList = []
+        it = iter(outList)
+        for x in it:
+            x = x.rstrip(':')
+            p = (x, float(next(it)), float(next(it)))
+            probList.append(p)
+            #probList.append((x, float(next(it)), float(next(it)) ))
+        
+        #probList: (match, probability, pR)
+        return (bestMatch, list(probList)) 
     
     def reset(self, corpus=True, crm=False):
         if (corpus is True):
@@ -105,6 +118,12 @@ class pyrmClassifier:
             print >>output, classification_report(y_true, y_pred, target_names=self.categories)
         return out_dict
 
+    def print_classify(self, bestMatch, probList, print_location=sys.stdout):
+        print >>print_location, 'best match: ' + bestMatch[0]
+        print >>print_location, 'match, probability, pr:'
+        for tup in probList:
+            print >>print_location, '\t', str(tup[0]), str(tup[1]), str(tup[2]) #prints probability and pR
+
     def crm_files_exist(self):
         #check if crm files exist already
         allFilesExist = True
@@ -151,14 +170,7 @@ class pyrmClassifier:
             self._print_classify(bestMatch, probList)
         #clean_workspace()
 
-    
-    def _print_classify(self, bestMatch, probList, print_location):
-        print >>print_location, 'best match: ' + bestMatch[0]
-        print >>print_location, 'match, probability, pr:'
-        for tup in probList:
-            print >>print_location, '\t', str(tup[0]), str(tup[1]), str(tup[2]) #prints probability and pR
-
-    
+        
     def _plot_confusion_matrix(self, cm, labels, title='Confusion matrix', cmap=plt.cm.Blues):
         plt.imshow(cm, interpolation='nearest', cmap=cmap)
         plt.title(title)
@@ -263,32 +275,6 @@ class pyrmClassifier:
     def _untrain(self, trainingTxtFile, corpus_name):
         subprocess.call('crm ' + os.path.join(self.directory, 'unlearn.crm') +
                 ' ' + (corpus_name+'.css') + ' < '+ trainingTxtFile, shell=True)
-
-    # classifies textfile and returns best match and probabilities
-    # bestMatch = tuple(bestMatch bestProb, bestPR)
-    # probList = [ (twitterHandle1, probability1, pR1) (twitterHandle2, probability2, pR2) ...]
-    def _classify(self, text):
-        output = subprocess.check_output(
-                'echo \'' + text + '\'' + ' | ' + 'crm ' + os.path.join(self.directory, 'classify.crm'),
-                shell=True)
-        #output =  subprocess.check_output('crm ' + os.path.join(self.directory, 'classify.crm') + ' < ' + textFileName, shell=True) #string output from crm114
-        #os.remove(textFileName)
-        outList = output.split()
-        bestMatch = ( str(outList[0]), float(outList[1]), float(outList[2]) ) #(match, prob, pR)
-        outList = outList[3:]
-
-        probList = []
-        it = iter(outList)
-        for x in it:
-            x = x.rstrip(':')
-            p = (x, float(next(it)), float(next(it)))
-            probList.append(p)
-            #probList.append((x, float(next(it)), float(next(it)) ))
-        
-        #probList: (match, probability, pR)
-
-
-        return (bestMatch, list(probList)) 
 
     def _create_crm_files(self, file_names, classification_type, word_pat):
         #classification_type = classification_type.rstrip('>').strip('<')
