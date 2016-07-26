@@ -20,7 +20,7 @@ class pyrmClassifier:
             word_pattern='[[:graph:]]+',
             reset=True):
         self.categories = list_of_categories #list of categories to classify to
-        self.directory = directory #directory to save all files
+        self.directory = self._create_directory #directory to save all files
         self.algorithm = algorithm
         if reset is True:
             self.reset()
@@ -170,6 +170,9 @@ class pyrmClassifier:
             self._print_classify(bestMatch, probList)
         #clean_workspace()
 
+    def _create_directory(self, dir_name):
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)
         
     def _plot_confusion_matrix(self, cm, labels, title='Confusion matrix', cmap=plt.cm.Blues):
         plt.imshow(cm, interpolation='nearest', cmap=cmap)
@@ -264,8 +267,6 @@ class pyrmClassifier:
             raise Exception('TUNE not implemented yet')
         else: #by default train everything (TET)
             self._train(textfilename, truth_match_name)
-
-
 
     def _train(self, trainingTxtFile, corpus_name):
         if corpus_name not in self.categories:
