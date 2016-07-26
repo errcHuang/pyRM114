@@ -33,7 +33,7 @@ class pyrmClassifier:
         file_dir = os.path.join(self.directory, random_file_name)
         with open(file_dir, 'w') as f:
             f.write(training_string)
-        bestMatch, probList = self.classify(training_string, record=False) #classify
+        bestMatch, probList = self.classify(training_string) #classify
         self._smart_train(bestMatch, probList, category, train_method, file_dir, pr)
         os.remove(file_dir)
 
@@ -44,7 +44,7 @@ class pyrmClassifier:
         self._untrain(file_dir, category)
         os.remove(file_dir)
 
-    def classify(self, string, record=True, output=sys.stdout, random_file_name='classify.tmp'):
+    def classify(self, string, record=False, output=sys.stdout, random_file_name='classify.tmp'):
         #write to text file
         #r = random.randint(0, len(string))
         #file_dir = os.path.join(self.directory, random_file_name)
