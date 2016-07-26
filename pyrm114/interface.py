@@ -49,8 +49,8 @@ class pyrmClassifier:
     # probList = [ (twitterHandle1, probability1, pR1) (twitterHandle2, probability2, pR2) ...]
     def classify(self, text):
         output = subprocess.check_output(
-                'echo \'' + text + '\'' + ' | ' + 'crm ' + os.path.join(self.directory, 'classify.crm'),
-                shell=True)
+                'echo \'' + text + '\'' + ' | ' + 'crm ' + 'classify.crm',
+                shell=True, cwd=self.directory)
         #output =  subprocess.check_output('crm ' + os.path.join(self.directory, 'classify.crm') + ' < ' + textFileName, shell=True) #string output from crm114
         #os.remove(textFileName)
         outList = output.split()
@@ -190,8 +190,7 @@ class pyrmClassifier:
     #match: (name_of_match, prob_of_match, pr_of_match)
     #probList = [ (name1, probability1, pR1) (name2, probability2, pR2) ...]
     #train_method: (name_of_method, pR_threshold)
-    def _smart_train(self, match, probList, truth_match_name, train_method, textfilename, 
-            prThreshold = 10.0):
+    def _smart_train(self, match, probList, truth_match_name, train_method, textfilename, prThreshold = 10.0):
         name_of_match = match[0]
         pr = match[2]
         if train_method == 'TOE': #train on error
@@ -270,13 +269,14 @@ class pyrmClassifier:
             self._train(textfilename, truth_match_name)
 
     def _train(self, trainingTxtFile, corpus_name):
+        trainingTxtFile = ntpath.basename(trainingTxtFile)
         if corpus_name not in self.categories:
             raise ValueError('Category doesn\'t exist!')
-        subprocess.call('crm ' + os.path.join(self.directory, 'learn.crm') +
-                ' ' + (corpus_name+'.css') + ' < '+ trainingTxtFile, shell=True)
+        subprocess.call('crm ' + 'learn.crm' + ' ' + (corpus_name+'.css') + ' < '+ trainingTxtFile, shell=True, cwd=self.directory)
     def _untrain(self, trainingTxtFile, corpus_name):
-        subprocess.call('crm ' + os.path.join(self.directory, 'unlearn.crm') +
-                ' ' + (corpus_name+'.css') + ' < '+ trainingTxtFile, shell=True)
+        trainingTxtFile = ntpath.basename(trainingTxtFile)
+        subprocess.call('crm ' + 'unlearn.crm' +
+                ' ' + (corpus_name+'.css') + ' < '+ trainingTxtFile, shell=True, cwd=self.directory)
 
     def _create_crm_files(self, file_names, classification_type, word_pat):
         #classification_type = classification_type.rstrip('>').strip('<')
@@ -326,6 +326,9 @@ class pyrmClassifier:
 
         #create corpus files
         for n in file_names:
-            pipe = os.popen(('crm '+ os.path.join(self.directory,'learn.crm') + ' ' +  str(n + CLASSIFICATION_EXT)), 'w')
+            cmd = ('crm '+ 'learn.crm' + ' ' +  str(n + CLASSIFICATION_EXT))
+            #print cmd
+            pipe = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, cwd=self.directory).stdin
+            #pipe = os.popen(('crm '+ os.path.join(self.directory,'learn.crm') + ' ' +  str(n + CLASSIFICATION_EXT)), 'w')
             pipe.close()
         #print 'created corpus files'
