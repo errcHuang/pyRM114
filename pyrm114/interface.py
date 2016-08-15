@@ -9,6 +9,7 @@ import argparse
 import random
 import ntpath
 
+#TO-DO: make training echo like classify is
 #basically training and test set partitioning is outside scope of class,
 #though there will be an evaluator function
 class pyrmClassifier:
