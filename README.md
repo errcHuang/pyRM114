@@ -1,6 +1,6 @@
 # pyRM114: python wrapper for CRM114 
 
-**_Makes CRM114 beautiful and easy to use via a python wrapper interface__**
+**_Makes CRM114 beautiful and easy to use via a python wrapper interface_**
 
 ## Requirements:
 - Python 2.7
